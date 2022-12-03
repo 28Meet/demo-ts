@@ -165,6 +165,7 @@ const Form = () => {
 
     const setCity = (value: string) => {
         setData({...data, city : value});
+        removeError("city");
     }
 
     const parentStyle : Partial<IStackStyles> = {
@@ -202,7 +203,7 @@ const Form = () => {
                 />
             </Stack.Item>
 
-            <DropDown label="City" options={selectOptions} setCity={setCity} value={city} />
+            <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")}/>
 
         </Stack>
     );

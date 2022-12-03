@@ -5,7 +5,10 @@ type DropwdownProps = {
     options: IDropdownOption[],
     label: string,
     setCity: Function,
-    value : string
+    value : string,
+    error : boolean,
+    errorMsg : string,
+    onLeave : Function
 }
 
 const dropDownStyle:Partial<IDropdownStyles> = {
@@ -15,7 +18,7 @@ const dropDownStyle:Partial<IDropdownStyles> = {
 }
 
 const DropDown = (props: DropwdownProps) => {
-    let { options, label, setCity, value} = props;
+    let { options, label, setCity, value, error, errorMsg, onLeave} = props;
     return (
         <>
             <Dropdown 
@@ -27,6 +30,8 @@ const DropDown = (props: DropwdownProps) => {
                     setCity(value);
                 }}
                 defaultSelectedKey={value}
+                {...(error && {errorMessage : errorMsg})}
+                onBlur={() => onLeave()}
                 required
             />
         </>
