@@ -1,40 +1,47 @@
 import { ITextFieldStyleProps, ITextFieldStyles, TextField } from "@fluentui/react/lib/TextField";
-import React , {FormEvent} from "react";
-import { MethodSignature } from "typescript";
+import { Stack, IStackStyles } from "@fluentui/react/lib/Stack";
+import React, { FormEvent } from "react";
 
 type InputProps = {
-    name : string,
-    Label : string,
-    value? : string ,
-    multiline : boolean,
-    error : boolean,
-    errorMsg : string,
-    onchange : Function,
-    onLeave : Function,
-    onKeyPress : Function
+    name: string,
+    Label: string,
+    value?: string,
+    multiline: boolean,
+    error: boolean,
+    errorMsg: string,
+    onLeave: Function,
+    onKeyPress: Function,
+    onchange: Function
 }
 
-const styles = ( props : ITextFieldStyleProps) : Partial<ITextFieldStyles> => ({
-    root : {
-         width : '300px'
-    }
- })
+const stackStyles:React.CSSProperties = {
+    textAlign : "left"
+}
 
-const Input = (props : InputProps) => {
-    let { name, Label, value, multiline, error, errorMsg, onchange,onLeave, onKeyPress} = props;
+// const styles = (props: ITextFieldStyleProps): Partial<ITextFieldStyles> => ({
+//     root: {
+//         width: '300px'
+//     }
+// })
 
-    return(
+const Input = (props: InputProps) => {
+    let { name, Label, value, multiline, error, errorMsg, onLeave, onKeyPress, onchange } = props;
+
+    return (
         <>
-            <TextField 
-                name ={name}
-                label={Label}
-                value={value}
-                styles={styles}
-                multiline={multiline}
-                {...(error && {errorMessage : errorMsg})}
-                onBlur={() => onLeave()}
-                onKeyUp={() => onKeyPress()}
-            />
+            <Stack.Item style={stackStyles}>
+                <TextField
+                    name={name}
+                    label={Label}
+                    value={value}
+                    multiline={multiline}
+                    {...(error && { errorMessage: errorMsg })}
+                    onBlur={() => onLeave()}
+                    onChange={(e: FormEvent) => { onchange(e) }}
+                    onKeyUp={() => onKeyPress()}
+                    required
+                />
+            </Stack.Item>
         </>
     );
 }
