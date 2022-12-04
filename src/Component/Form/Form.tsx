@@ -11,6 +11,7 @@ import DropDown from "../common/dropdown/DropDown";
 import Button from "../common/button/Button";
 import RadioButton from "../common/radiogroup/RadioButton";
 import NumberTxtFeild from "../common/numbertxtField/NumberTxtFeild";
+import { json } from "stream/consumers";
 
 type StateTypes = {
     name: string,
@@ -57,12 +58,12 @@ const selectOptions: IDropdownOption[] = [
 
 const Form = () => {
     const [data, setData] = useState<StateTypes>({
-        name: "",
-        address: "",
+        name: "Meet",
+        address: "vastral",
         mail: "meetpanchal@gmail.com",
         number: "1234567890",
         gender: "male",
-        city: "",
+        city: "Ahmedabad",
         id: 0
     });
     const [error, setError] = useState<errorTypes>({
@@ -174,7 +175,7 @@ const Form = () => {
 
     const parentStyle: Partial<IStackStyles> = {
         root: {
-            width: "45%",
+            width: "35%",
             display: "block",
             border: '2px solid black',
             padding: "1rem",
@@ -184,8 +185,58 @@ const Form = () => {
     }
 
     const buttonStyles = {
-        display : "flex",
-        justifyContent : "space-evenly"
+        display: "flex",
+        justifyContent: "space-evenly"
+    }
+
+    const handleSubmit = () => {
+        if (name == "" && address == "" && mail == "" && number == "" && gender == "" && city == "") {
+            setError({
+                nameError: true,
+                addressError: true,
+                mailError: true,
+                numberError: true,
+                genderError: true,
+                cityError: true
+            });
+        } else if (name == "") {
+            setError({ ...error, nameError: true });
+        } else if (address == "") {
+            setError({ ...error, addressError: true });
+        } else if (mail == "") {
+            setError({ ...error, mailError: true });
+        } else if (number == "") {
+            setError({ ...error, numberError: true });
+        } else if (gender == "") {
+            setError({ ...error, genderError: true });
+        } else if (city == "") {
+            setError({ ...error, cityError: true });
+        } else {
+            let ID = Number(localStorage.getItem("ID"));
+            let record = new Array();
+
+            /* here getIterm() return string or {} so ts generate an error 
+                so when we sure about that the data come from localstorage in 
+                not an empty so that time we declare ! sign to tell ts that
+                it not be null
+            */
+            record = JSON.parse(localStorage.getItem("RECORD")!); 
+
+            if (record.length != 0) {
+                data.id = ID;
+                record.push(data);
+                ID++;
+                localStorage.setItem("RECORD", JSON.stringify(record));
+                localStorage.setItem("ID", JSON.stringify(ID));
+            } else {
+                data.id = 1;
+                ID = 2;
+                record = [];
+                record.push(data);
+                localStorage.setItem("RECORD", JSON.stringify(record));
+                localStorage.setItem("ID", JSON.stringify(ID));
+            }
+        }
     }
 
     return (
@@ -210,7 +261,6 @@ const Form = () => {
                         let value = option?.key;
                         setData({ ...data, gender: value });
                     }}
-
                     required
                 />
             </Stack.Item>
@@ -224,8 +274,8 @@ const Form = () => {
             </Stack.Item>
 
             <Stack.Item style={buttonStyles}>
-                <Button text="Sign Up" color="#0078d4" textColor="white" />
-                <Button text="Reset" color="#9c27b0" textColor="white" />
+                <Button text="Sign Up" color="#0078d4" textColor="white" onclick={handleSubmit} />
+                {/* <Button text="Reset" color="#9c27b0" textColor="white" /> */}
             </Stack.Item>
         </Stack>
     );
