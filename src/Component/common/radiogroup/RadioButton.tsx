@@ -1,36 +1,52 @@
+import React, { FormEvent } from "react";
+import { Stack } from "@fluentui/react";
 import { ChoiceGroup, IChoiceGroupOption, IChoiceGroupStyles } from "@fluentui/react/lib/ChoiceGroup";
-import { GenderType } from "../constants/Constants";
-import { Stack, IStackStyles } from "@fluentui/react/lib/Stack";
-import { FormEvent } from "react";
 
-type radioPropsType = {
-    name : string,
-    options : IChoiceGroupOption[],
-    label : string,
-    onchange : Function
+type propsType = {
+    name: string,
+    value: string,
+    options: IChoiceGroupOption[],
+    label: string,
+    setGender: Function
 }
 
-const CGStyles: IChoiceGroupStyles = {
-    root: {
-        display: 'inline',
-        alignItems: 'left'
+const RadioButton = (props: propsType) => {
+    let { name, value, options, label, setGender } = props;
+
+    const genderStyels: React.CSSProperties = {
+        display: 'flex',
+        flexDirection: "row",
+        textAlign: "left",
+        margin: 0,
+        padding: 0,
+        width: "100%"
     }
-}
 
-const RadioButton = (props : radioPropsType) => {
-    let { name, options, label, onchange} = props;
-    return(
+    const CGStyles: IChoiceGroupStyles = {
+        label: {
+            display: "inline"
+        },
+        flexContainer: {
+            columnGap: "1em",
+            display: "inline-flex",
+            flexDirection: "row",
+            flexWrap: "wrap"
+        }
+    }
+
+    return (
         <>
-            <Stack.Item>
-                <ChoiceGroup 
+            <Stack.Item style={genderStyels}>
+                <ChoiceGroup
                     name={name}
-                    label={label}
+                    value={value}
                     options={options}
-                    styles={CGStyles}
-                    onChange={(ev?: FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
-                        let value = option?.value;
-                        onchange(option?.value);
+                    label={label}
+                    onChange={(ev?: FormEvent<HTMLElement | HTMLInputElement>, option?:IChoiceGroupOption) => {
+                        let value = option?.key;
+                        setGender(ev,value);
                     }}
+                    defaultSelectedKey={"male"}
                     required
                 />
             </Stack.Item>

@@ -1,12 +1,14 @@
 import { useState, useEffect, FormEvent } from "react";
+import { FontSizes } from '@fluentui/theme';
+import { Checkbox } from '@fluentui/react';
 import { Stack, IStackStyles } from "@fluentui/react/lib/Stack";
 import { ChoiceGroup, IChoiceGroupOption, IChoiceGroupStyles } from "@fluentui/react/lib/ChoiceGroup";
 import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
 import { DefaultButton, PrimaryButton } from "@fluentui/react/lib/Button";
-import { Checkbox } from '@fluentui/react';
 import { GenderOptions } from "../common/constants/Constants";
 import Input from "../common/input/Input";
 import DropDown from "../common/dropdown/DropDown";
+import Button from "../common/button/Button";
 import RadioButton from "../common/radiogroup/RadioButton";
 import NumberTxtFeild from "../common/numbertxtField/NumberTxtFeild";
 
@@ -44,12 +46,12 @@ const options: IChoiceGroupOption[] = [
 ];
 
 const selectOptions: IDropdownOption[] = [
-    {key : "", text : "--Select--"},
-    {key : "Ahmedabad", text : "Ahmedabad"},
-    {key : "Rajkot", text : "Rajkot"},
-    {key : "Bhavnagar", text : "Bhavnagar"},
-    {key : "Baroda", text : "Baroda"},
-    {key : "Surat", text : "Surat"},
+    { key: "", text: "--Select--" },
+    { key: "Ahmedabad", text: "Ahmedabad" },
+    { key: "Rajkot", text: "Rajkot" },
+    { key: "Bhavnagar", text: "Bhavnagar" },
+    { key: "Baroda", text: "Baroda" },
+    { key: "Surat", text: "Surat" },
 ]
 
 
@@ -84,13 +86,13 @@ const Form = () => {
     let { nameError, addressError, mailError, numberError, genderError, cityError } = error;
     let { nameMsg, addressMsg, mailMsg, numberMsg, genderMsg, cityMsg } = errorMsg;
 
-    const genderStyles : React.CSSProperties = {
-        display : 'flex',
-        flexDirection : "row",
-        textAlign : "left",
-        margin : 0,
-        padding : 0,
-        width : "100%"
+    const genderStyles: React.CSSProperties = {
+        display: 'flex',
+        flexDirection: "row",
+        textAlign: "left",
+        margin: 0,
+        padding: 0,
+        width: "100%"
     }
 
     const CGStyles: IChoiceGroupStyles = {
@@ -159,27 +161,36 @@ const Form = () => {
         setData({ ...data, [name]: value })
     }
 
-    const setGenderValue = (value: string) => {
-        setData({ ...data, gender: value });
+    // const setGenderValue = (event: string, value: string) => {
+    //     // console.log(value);
+    //     // setData({ ...data, gender: value });
+    //     console.log(data);
+    // }
+
+    const setCity = (event: string, option: string) => {
+        let value = option;
+        setData({ ...data, city: value });
     }
 
-    const setCity = (value: string) => {
-        setData({...data, city : value});
-        removeError("city");
+    const parentStyle: Partial<IStackStyles> = {
+        root: {
+            width: "45%",
+            display: "block",
+            border: '2px solid black',
+            padding: "1rem",
+            paddingTop: "0.1rem",
+            margin: "auto"
+        }
     }
 
-    const parentStyle : Partial<IStackStyles> = {
-            root : {
-                width : "40%",
-                display : "block",
-                border : '2px solid black',
-                padding : "2rem",
-                margin : "auto"
-            }
+    const buttonStyles = {
+        display : "flex",
+        justifyContent : "space-evenly"
     }
 
     return (
         <Stack styles={parentStyle}>
+            <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco" }}>Registration</h2>
             <Input name="name" Label="Name" value={name} multiline={false} error={nameError} errorMsg={nameMsg} onKeyPress={() => removeError('name')} onLeave={() => checkError("name")} onchange={handleChange} />
 
             <Input name="address" Label="Address" value={address} multiline={true} error={addressError} errorMsg={addressMsg} onKeyPress={() => removeError("address")} onLeave={() => checkError("address")} onchange={handleChange} />
@@ -196,15 +207,26 @@ const Form = () => {
                     label="Gender"
                     styles={CGStyles}
                     onChange={(ev?: FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
-                        let value = option?.text;
+                        let value = option?.key;
                         setData({ ...data, gender: value });
                     }}
+
                     required
                 />
             </Stack.Item>
 
-            <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")}/>
+            {/* <RadioButton name="gender" value={gender} options={options} label="Gender" setGender={setGenderValue} /> */}
 
+            <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")} removeError={() => removeError("city")} />
+
+            <Stack.Item style={{ marginTop: "10px" }}>
+                <Checkbox label="I have read and understand company terms and conditions." />
+            </Stack.Item>
+
+            <Stack.Item style={buttonStyles}>
+                <Button text="Sign Up" color="#0078d4" textColor="white" />
+                <Button text="Reset" color="#9c27b0" textColor="white" />
+            </Stack.Item>
         </Stack>
     );
 }
