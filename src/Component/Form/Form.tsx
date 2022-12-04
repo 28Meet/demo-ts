@@ -13,6 +13,10 @@ import RadioButton from "../common/radiogroup/RadioButton";
 import NumberTxtFeild from "../common/numbertxtField/NumberTxtFeild";
 import { json } from "stream/consumers";
 
+type formPropTypes = {
+    editid: number;
+}
+
 type StateTypes = {
     name: string,
     address: string,
@@ -56,14 +60,15 @@ const selectOptions: IDropdownOption[] = [
 ]
 
 
-const Form = () => {
+const Form = (props: formPropTypes) => {
+    let { editid } = props;
     const [data, setData] = useState<StateTypes>({
-        name: "Meet",
-        address: "vastral",
-        mail: "meetpanchal@gmail.com",
-        number: "1234567890",
-        gender: "male",
-        city: "Ahmedabad",
+        name: "",
+        address: "",
+        mail: "",
+        number: "",
+        gender: "",
+        city: "",
         id: 0
     });
     const [error, setError] = useState<errorTypes>({
@@ -82,6 +87,7 @@ const Form = () => {
         genderMsg: "Please select your gender",
         cityMsg: "Please select your city"
     });
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
 
     let { name, address, mail, number, gender, city, id } = data;
     let { nameError, addressError, mailError, numberError, genderError, cityError } = error;
@@ -212,36 +218,71 @@ const Form = () => {
         } else if (city == "") {
             setError({ ...error, cityError: true });
         } else {
-            let ID = Number(localStorage.getItem("ID"));
-            let record = new Array();
-
-            /* here getIterm() return string or {} so ts generate an error 
-                so when we sure about that the data come from localstorage in 
-                not an empty so that time we declare ! sign to tell ts that
-                it not be null
-            */
-            record = JSON.parse(localStorage.getItem("RECORD")!); 
-
-            if (record.length != 0) {
-                data.id = ID;
-                record.push(data);
-                ID++;
-                localStorage.setItem("RECORD", JSON.stringify(record));
-                localStorage.setItem("ID", JSON.stringify(ID));
+            if (isUpdate) {
+                let user = new Array();
+                user = JSON.parse(localStorage.getItem("RECORD")!);
+                for(let i = 0 ; i < user.length; i++){
+                    if(user[i].id == editid){
+                        user[i].name = data.name;
+                        user[i].address = data.address;
+                        user[i].mail = data.mail;
+                        user[i].number = data.number;
+                        user[i].gender = data.gender;
+                        user[i].city = data.city;
+                    }
+                }
+                localStorage.setItem("RECORD", JSON.stringify(user));
+                setIsUpdate(false);
             } else {
-                data.id = 1;
-                ID = 2;
-                record = [];
-                record.push(data);
-                localStorage.setItem("RECORD", JSON.stringify(record));
-                localStorage.setItem("ID", JSON.stringify(ID));
+                let ID = Number(localStorage.getItem("ID"));
+                let record = new Array();
+
+                /* here getIterm() return string or {} so ts generate an error 
+                    so when we sure about that the data come from localstorage in 
+                    not an empty so that time we declare ! sign to tell ts that
+                    it not be null
+                */
+                record = JSON.parse(localStorage.getItem("RECORD")!);
+
+                if (record.length != 0) {
+                    data.id = ID;
+                    record.push(data);
+                    ID++;
+                    localStorage.setItem("RECORD", JSON.stringify(record));
+                    localStorage.setItem("ID", JSON.stringify(ID));
+                } else {
+                    data.id = 1;
+                    ID = 2;
+                    record = [];
+                    record.push(data);
+                    localStorage.setItem("RECORD", JSON.stringify(record));
+                    localStorage.setItem("ID", JSON.stringify(ID));
+                }
             }
         }
     }
 
+    const getUserData = () => {
+        setIsUpdate(true);
+        let user = new Array();
+        user = JSON.parse(localStorage.getItem("RECORD")!);
+        let userrecord = user.find((record) => {
+            return record.id == editid;
+        });
+        setData(userrecord);
+    }
+
+    useEffect(() => {
+        (editid != 0 && getUserData());
+    }, [editid]);
+
     return (
         <Stack styles={parentStyle}>
-            <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco" }}>Registration</h2>
+            <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco" }}>
+                {
+                    (isUpdate) ? "Update" : "Registration"
+                }
+            </h2>
             <Input name="name" Label="Name" value={name} multiline={false} error={nameError} errorMsg={nameMsg} onKeyPress={() => removeError('name')} onLeave={() => checkError("name")} onchange={handleChange} />
 
             <Input name="address" Label="Address" value={address} multiline={true} error={addressError} errorMsg={addressMsg} onKeyPress={() => removeError("address")} onLeave={() => checkError("address")} onchange={handleChange} />
@@ -253,7 +294,9 @@ const Form = () => {
             <Stack.Item style={genderStyles}>
                 <ChoiceGroup
                     name="gender"
-                    value={gender}
+                    // value={gender}
+                    defaultSelectedKey={gender}
+                    selectedKey={gender}
                     options={options}
                     label="Gender"
                     styles={CGStyles}
@@ -274,7 +317,7 @@ const Form = () => {
             </Stack.Item>
 
             <Stack.Item style={buttonStyles}>
-                <Button text="Sign Up" color="#0078d4" textColor="white" onclick={handleSubmit} />
+                <Button  {...(isUpdate ? { text: "Update" } : { text: "Sign Up" })} color="#0078d4" textColor="white" onclick={handleSubmit} />
                 {/* <Button text="Reset" color="#9c27b0" textColor="white" /> */}
             </Stack.Item>
         </Stack>

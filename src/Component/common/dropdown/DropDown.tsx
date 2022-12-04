@@ -32,6 +32,7 @@ const DropDown = (props: DropwdownProps) => {
                     removeError();
                 }}
                 defaultSelectedKey={value}
+                selectedKey={value}
                 {...(error && {errorMessage : errorMsg})}
                 onBlur={() => onLeave()}
                 required

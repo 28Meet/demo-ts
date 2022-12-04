@@ -69,7 +69,7 @@ function App() {
 
   return (
     <div className="App">
-        <Form />
+        <Form editid={2} />
     </div>
   );
 }
