@@ -31,8 +31,8 @@ const DropDown = (props: DropwdownProps) => {
                     setCity(event,value);
                     removeError();
                 }}
-                defaultSelectedKey={value}
                 selectedKey={value}
+                // defaultSelectedKey={value}
                 {...(error && {errorMessage : errorMsg})}
                 onBlur={() => onLeave()}
                 required

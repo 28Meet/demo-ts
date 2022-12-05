@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from "react";
 import { FontSizes } from '@fluentui/theme';
-import { Checkbox } from '@fluentui/react';
+import { Checkbox, initializeIcons, Text } from '@fluentui/react';
 import { Stack, IStackStyles } from "@fluentui/react/lib/Stack";
 import { ChoiceGroup, IChoiceGroupOption, IChoiceGroupStyles } from "@fluentui/react/lib/ChoiceGroup";
 import { IDropdownOption } from "@fluentui/react/lib/Dropdown";
@@ -13,6 +13,8 @@ import RadioButton from "../common/radiogroup/RadioButton";
 import NumberTxtFeild from "../common/numbertxtField/NumberTxtFeild";
 import { json } from "stream/consumers";
 
+initializeIcons();
+
 type formPropTypes = {
     editid: number;
 }
@@ -24,6 +26,7 @@ type StateTypes = {
     number: string,
     gender: string | undefined,
     city: string,
+    permission : boolean,
     id: number
 }
 
@@ -33,7 +36,8 @@ type errorTypes = {
     mailError: boolean,
     numberError: boolean,
     genderError: boolean,
-    cityError: boolean
+    cityError: boolean,
+    permissionError : boolean
 }
 
 type errorMsgTypes = {
@@ -51,7 +55,7 @@ const options: IChoiceGroupOption[] = [
 ];
 
 const selectOptions: IDropdownOption[] = [
-    { key: "", text: "--Select--" },
+    { key: "--Select--", text: "--Select--" },
     { key: "Ahmedabad", text: "Ahmedabad" },
     { key: "Rajkot", text: "Rajkot" },
     { key: "Bhavnagar", text: "Bhavnagar" },
@@ -62,23 +66,27 @@ const selectOptions: IDropdownOption[] = [
 
 const Form = (props: formPropTypes) => {
     let { editid } = props;
-    const [data, setData] = useState<StateTypes>({
+    let initialState = {
         name: "",
         address: "",
         mail: "",
         number: "",
         gender: "",
-        city: "",
+        city: "--Select--",
+        permission : false,
         id: 0
-    });
-    const [error, setError] = useState<errorTypes>({
+    }
+    let initialErrorState = {
         nameError: false,
         addressError: false,
         mailError: false,
         numberError: false,
         genderError: false,
-        cityError: false
-    });
+        cityError: false,
+        permissionError : false,
+    }
+    const [data, setData] = useState<StateTypes>(initialState);
+    const [error, setError] = useState<errorTypes>(initialErrorState);
     const [errorMsg, setErrorMsg] = useState<errorMsgTypes>({
         nameMsg: "Please enter your name",
         addressMsg: "Please enter your address",
@@ -89,17 +97,23 @@ const Form = (props: formPropTypes) => {
     });
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
 
-    let { name, address, mail, number, gender, city, id } = data;
-    let { nameError, addressError, mailError, numberError, genderError, cityError } = error;
+    let { name, address, mail, number, gender, city, id, permission } = data;
+    let { nameError, addressError, mailError, numberError, genderError, cityError, permissionError } = error;
     let { nameMsg, addressMsg, mailMsg, numberMsg, genderMsg, cityMsg } = errorMsg;
 
     const genderStyles: React.CSSProperties = {
-        display: 'flex',
+        display: 'block',
         flexDirection: "row",
         textAlign: "left",
         margin: 0,
         padding: 0,
         width: "100%"
+    }
+
+    const errorTextStyle : React.CSSProperties = {
+        color : "#a4262c",
+        display : "block",
+        fontSize : "12px"
     }
 
     const CGStyles: IChoiceGroupStyles = {
@@ -141,7 +155,7 @@ const Form = (props: formPropTypes) => {
         } else if (fieldName == "gender") {
             (gender == "" && setError({ ...error, genderError: true }))
         } else if (fieldName == "city") {
-            (city == "" && setError({ ...error, cityError: true }))
+            (city == "--Select--" && setError({ ...error, cityError: true }))
         } else { }
     }
 
@@ -158,6 +172,8 @@ const Form = (props: formPropTypes) => {
             setError({ ...error, genderError: false });
         } else if (fieldName == "city") {
             setError({ ...error, cityError: false });
+        } else if(fieldName == "permission") {
+            setError({...error, permissionError : false })
         } else {
 
         }
@@ -196,14 +212,15 @@ const Form = (props: formPropTypes) => {
     }
 
     const handleSubmit = () => {
-        if (name == "" && address == "" && mail == "" && number == "" && gender == "" && city == "") {
+        if (name == "" && address == "" && mail == "" && number == "" && gender == "" && city == "--Select--" && permission == false) {
             setError({
                 nameError: true,
                 addressError: true,
                 mailError: true,
                 numberError: true,
                 genderError: true,
-                cityError: true
+                cityError: true,
+                permissionError : true
             });
         } else if (name == "") {
             setError({ ...error, nameError: true });
@@ -217,6 +234,8 @@ const Form = (props: formPropTypes) => {
             setError({ ...error, genderError: true });
         } else if (city == "") {
             setError({ ...error, cityError: true });
+        } else if(permission == false) {
+            setError({ ...error, permissionError : true})
         } else {
             if (isUpdate) {
                 let user = new Array();
@@ -229,6 +248,7 @@ const Form = (props: formPropTypes) => {
                         user[i].number = data.number;
                         user[i].gender = data.gender;
                         user[i].city = data.city;
+                        user[i].permission = data.permission;
                     }
                 }
                 localStorage.setItem("RECORD", JSON.stringify(user));
@@ -260,6 +280,11 @@ const Form = (props: formPropTypes) => {
                 }
             }
         }
+    }
+
+    const handleReset = () => {
+       setData(initialState);
+       setError(initialErrorState);
     }
 
     const getUserData = () => {
@@ -306,6 +331,11 @@ const Form = (props: formPropTypes) => {
                     }}
                     required
                 />
+                <Stack.Item>
+                {
+                    (genderError && <Text style={errorTextStyle}>Please select your gender</Text>)
+                }
+                </Stack.Item>
             </Stack.Item>
 
             {/* <RadioButton name="gender" value={gender} options={options} label="Gender" setGender={setGenderValue} /> */}
@@ -313,12 +343,17 @@ const Form = (props: formPropTypes) => {
             <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")} removeError={() => removeError("city")} />
 
             <Stack.Item style={{ marginTop: "10px" }}>
-                <Checkbox label="I have read and understand company terms and conditions." />
+                <Checkbox checked={permission} onChange={() => {removeError('permission'); setData({...data, permission : true})}} label="I have read and understand company terms and conditions." />
+                <Stack.Item>
+                    {
+                        (permissionError && <Text style={{ color: "#a4262c", display : "block", fontSize : "12px", textAlign : "left"}}>You must accept terms and conditions</Text>)
+                    }
+                </Stack.Item>
             </Stack.Item>
 
             <Stack.Item style={buttonStyles}>
                 <Button  {...(isUpdate ? { text: "Update" } : { text: "Sign Up" })} color="#0078d4" textColor="white" onclick={handleSubmit} />
-                {/* <Button text="Reset" color="#9c27b0" textColor="white" /> */}
+                <Button text="Reset" color="#9c27b0" textColor="white" onclick={handleReset} />
             </Stack.Item>
         </Stack>
     );

@@ -1,6 +1,8 @@
 import React, {useEffect} from 'react';
 import './App.css';
+import Header from './Component/common/header/Header';
 import Form from './Component/Form/Form';
+import Table from './Component/UserDetails/Table/Table';
 
 // type arrayType = {
 //   name : string,
@@ -9,6 +11,7 @@ import Form from './Component/Form/Form';
 //   number : string,
 //   gender : string,
 //   city : string,
+//   permission : boolean,
 //   id : number
 // }[]
 
@@ -23,6 +26,7 @@ function App() {
   //     "number": "1234567890",
   //     "gender": "male",
   //     "city": "Ahmedabad",
+  //     "permission" : true,
   //     "id": 1
   //   },
   //   {
@@ -32,6 +36,7 @@ function App() {
   //     "number": "6652097109",
   //     "gender": "male",
   //     "city": "Surat",
+  //     "permission" : true,
   //     "id": 2
   //   },
   //   {
@@ -41,6 +46,7 @@ function App() {
   //     "number": "1234567890",
   //     "gender": "male",
   //     "city": "Ahmedabad",
+  //     "permission" : true,
   //     "id": 3
   //   },
   //   {
@@ -50,6 +56,7 @@ function App() {
   //     "number": "5647890123",
   //     "gender": "male",
   //     "city": "Rajkot",
+  //     "permission" : true,
   //     "id": 4
   //   },
   //   {
@@ -59,6 +66,7 @@ function App() {
   //     "number": "1234567890",
   //     "gender": "male",
   //     "city": "Ahmedabad",
+  //     "permission" : true,
   //     "id": 5
   //   }
   // ]
@@ -69,7 +77,9 @@ function App() {
 
   return (
     <div className="App">
-        <Form editid={2} />
+      {/* <Header /> */}
+      {/* <Table /> */}
+        <Form editid={5} />
     </div>
   );
 }
