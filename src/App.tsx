@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import Header from './Component/common/header/Header';
 import Form from './Component/Form/Form';
-import Table from './Component/UserDetails/Table/Table';
-
+import { Table } from './Component/UserDetails/Table/Table';
 // type arrayType = {
 //   name : string,
 //   address : string,
@@ -12,6 +11,7 @@ import Table from './Component/UserDetails/Table/Table';
 //   gender : string,
 //   city : string,
 //   permission : boolean,
+//   isDeleted : boolean,
 //   id : number
 // }[]
 
@@ -27,6 +27,7 @@ function App() {
   //     "gender": "male",
   //     "city": "Ahmedabad",
   //     "permission" : true,
+  //     "isDeleted" : false,
   //     "id": 1
   //   },
   //   {
@@ -37,6 +38,7 @@ function App() {
   //     "gender": "male",
   //     "city": "Surat",
   //     "permission" : true,
+  //     "isDeleted" : false,
   //     "id": 2
   //   },
   //   {
@@ -47,6 +49,7 @@ function App() {
   //     "gender": "male",
   //     "city": "Ahmedabad",
   //     "permission" : true,
+  //     "isDeleted" : false,
   //     "id": 3
   //   },
   //   {
@@ -57,6 +60,7 @@ function App() {
   //     "gender": "male",
   //     "city": "Rajkot",
   //     "permission" : true,
+  //     "isDeleted" : false,
   //     "id": 4
   //   },
   //   {
@@ -67,6 +71,7 @@ function App() {
   //     "gender": "male",
   //     "city": "Ahmedabad",
   //     "permission" : true,
+  //     "isDeleted" : false,
   //     "id": 5
   //   }
   // ]
@@ -79,7 +84,8 @@ function App() {
     <div className="App">
       {/* <Header /> */}
       {/* <Table /> */}
-        <Form editid={5} />
+      {/* <Form editid={0} /> */}
+      <Table />
     </div>
   );
 }

@@ -9,6 +9,8 @@ import { GenderOptions } from "../common/constants/Constants";
 import Input from "../common/input/Input";
 import DropDown from "../common/dropdown/DropDown";
 import Button from "../common/button/Button";
+import { initialState, initialErrorState } from "../common/Constants";
+import { AiOutlineClose } from "react-icons/ai";
 import RadioButton from "../common/radiogroup/RadioButton";
 import NumberTxtFeild from "../common/numbertxtField/NumberTxtFeild";
 import { json } from "stream/consumers";
@@ -66,25 +68,6 @@ const selectOptions: IDropdownOption[] = [
 
 const Form = (props: formPropTypes) => {
     let { editid } = props;
-    let initialState = {
-        name: "",
-        address: "",
-        mail: "",
-        number: "",
-        gender: "",
-        city: "--Select--",
-        permission : false,
-        id: 0
-    }
-    let initialErrorState = {
-        nameError: false,
-        addressError: false,
-        mailError: false,
-        numberError: false,
-        genderError: false,
-        cityError: false,
-        permissionError : false,
-    }
     const [data, setData] = useState<StateTypes>(initialState);
     const [error, setError] = useState<errorTypes>(initialErrorState);
     const [errorMsg, setErrorMsg] = useState<errorMsgTypes>({
@@ -265,19 +248,22 @@ const Form = (props: formPropTypes) => {
                 record = JSON.parse(localStorage.getItem("RECORD")!);
 
                 if (record.length != 0) {
-                    data.id = ID;
-                    record.push(data);
+                    // data.id = ID;
+                    // console.log(data);
+                    record.push({...data, id : ID}); 
+                    console.log(record);
                     ID++;
                     localStorage.setItem("RECORD", JSON.stringify(record));
                     localStorage.setItem("ID", JSON.stringify(ID));
-                } else {
-                    data.id = 1;
-                    ID = 2;
-                    record = [];
-                    record.push(data);
-                    localStorage.setItem("RECORD", JSON.stringify(record));
-                    localStorage.setItem("ID", JSON.stringify(ID));
-                }
+                } 
+                //else {
+                //     data.id = 1;
+                //     ID = 2;
+                //     record = [];
+                //     record.push(data);
+                //     localStorage.setItem("RECORD", JSON.stringify(record));
+                //     localStorage.setItem("ID", JSON.stringify(ID));
+                // }
             }
         }
     }
@@ -303,7 +289,7 @@ const Form = (props: formPropTypes) => {
 
     return (
         <Stack styles={parentStyle}>
-            <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco" }}>
+            <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco", color : "grey" }}>
                 {
                     (isUpdate) ? "Update" : "Registration"
                 }
@@ -343,7 +329,7 @@ const Form = (props: formPropTypes) => {
             <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")} removeError={() => removeError("city")} />
 
             <Stack.Item style={{ marginTop: "10px" }}>
-                <Checkbox checked={permission} onChange={() => {removeError('permission'); setData({...data, permission : true})}} label="I have read and understand company terms and conditions." />
+                <Checkbox checked={permission} onChange={() => {removeError('permission'); setData({...data, permission : !permission})}} label="I have read and understand company terms and conditions." />
                 <Stack.Item>
                     {
                         (permissionError && <Text style={{ color: "#a4262c", display : "block", fontSize : "12px", textAlign : "left"}}>You must accept terms and conditions</Text>)
