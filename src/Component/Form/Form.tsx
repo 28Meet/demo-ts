@@ -114,7 +114,9 @@ const Form = (props: formPropTypes) => {
     }
 
     const closeIcon: React.CSSProperties = {
-        cursor: "pointer"
+        cursor: "pointer",
+        position : "relative",
+        left : "130px"
     }
 
     const CGStyles: IChoiceGroupStyles = {
@@ -368,7 +370,7 @@ const Form = (props: formPropTypes) => {
 
                 <Stack.Item style={{ marginTop: "10px" }}>
                     <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Checkbox checked={permission} onChange={() => { removeError('permission'); setData({ ...data, permission: !permission }) }} />I have read and understand company  <a href="#" style={{ textDecoration: "none" }}> terms </a> and  <a href="#" style={{ textDecoration: "none" }}> conditions </a>.
+                        <Checkbox checked={permission} onChange={() => { removeError('permission'); setData({ ...data, permission: !permission }) }} />I have read and understand company&nbsp;<a href="#" style={{ textDecoration: "none" }}> terms </a> &nbsp;and &nbsp;<a href="#" style={{ textDecoration: "none" }}> conditions </a>.
                     </div>
                     <Stack.Item>
                         {

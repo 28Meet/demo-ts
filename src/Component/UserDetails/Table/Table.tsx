@@ -11,7 +11,7 @@ import { FaUserPlus } from 'react-icons/fa';
 import { MdDelete, MdEdit } from 'react-icons/md';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 import Form from '../../Form/Form';
-// import { PopupModal } from '../components/PopupModal';
+import { PopupModal } from '../../PopupModal/PopupModal';
 
 initializeIcons();
 
@@ -286,6 +286,12 @@ export class Table extends React.Component<{}, IDetailsListDocumentsExampleState
         })
     }
 
+    closePopup = () => {
+        console.log('popup close run..')
+        this.setState({
+            popUp: false,
+        })
+    }
 
     _getSelectedUser() {
         const selectedUser = this._selection.getSelection()[0] as IUser;
@@ -313,7 +319,7 @@ export class Table extends React.Component<{}, IDetailsListDocumentsExampleState
 
         return (
             <>
-                <div style={{...modal && { filter : "blur(3px)", pointerEvents : "none"}}}>
+                <div style={{ ...modal && { filter: "blur(3px)", pointerEvents: "none" } }}>
                     <div style={TableComponentStyle}>
                         <div className={classNames.controlWrapper}>
                             <TextField label="Search" onChange={this._onChangeText} styles={controlStyles} />
@@ -377,12 +383,13 @@ export class Table extends React.Component<{}, IDetailsListDocumentsExampleState
                     </div>
                 </div>
 
-
                 {
-                    (modal && <Form editid={0} currentUser={this.state.currentUser} setUpdatedUsers={this.setUpdatedUsers.bind(this)} closeModal={this.closeModal}/>)
+                    (modal && <Form editid={0} currentUser={this.state.currentUser} setUpdatedUsers={this.setUpdatedUsers.bind(this)} closeModal={this.closeModal} />)
                 }
 
-                {/* {modal && <Form closeModal={this.closeModal} currentUser={this.state.currentUser} setUpdatedUsers={this.setUpdatedUsers.bind(this)} />} */}
+                {
+                    (popUp && <PopupModal selectedUsers={this.state.selectedUsers} closePopup={this.closePopup} setUpdatedUsers={this.setUpdatedUsers.bind(this)} items={this.state.items} />)
+                }
             </>
         )
     }
