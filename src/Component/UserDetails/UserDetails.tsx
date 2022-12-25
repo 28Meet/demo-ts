@@ -7,9 +7,7 @@ const UserDetails = () => {
 
     return(
         <>
-            {
-                (openForm && <Form editid={4}/>)
-            }
+            
         </>
     );
 }

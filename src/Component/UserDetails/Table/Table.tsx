@@ -85,7 +85,8 @@ const TableComponentStyle: React.CSSProperties = {
     padding: '2rem',
     marginTop: '2rem',
     overflowY: 'scroll',
-    border: '1px solid gray'
+    border: '1px solid gray',
+    zIndex: 0,
 }
 
 export interface IDetailsListDocumentsExampleState {
@@ -179,8 +180,8 @@ export class Table extends React.Component<{}, IDetailsListDocumentsExampleState
                 key: 'Address',
                 name: 'Address',
                 fieldName: 'Address',
-                minWidth: 100,
-                maxWidth: 300,
+                minWidth: 300,
+                maxWidth: 700,
                 isResizable: true,
                 onColumnClick: this._onColumnClick,
                 data: 'string',
@@ -208,8 +209,8 @@ export class Table extends React.Component<{}, IDetailsListDocumentsExampleState
                 key: 'Email',
                 name: 'Email',
                 fieldName: 'Email',
-                minWidth: 70,
-                maxWidth: 90,
+                minWidth: 160,
+                maxWidth: 150,
                 isResizable: true,
                 isCollapsible: true,
                 data: 'string',
@@ -312,67 +313,74 @@ export class Table extends React.Component<{}, IDetailsListDocumentsExampleState
 
         return (
             <>
-                <div style={TableComponentStyle}>
-                    <div className={classNames.controlWrapper}>
-                        <TextField label="Search" onChange={this._onChangeText} styles={controlStyles} />
-                        <Announced message={`Number of items after filter applied: ${items.length}.`} />
-                        <TooltipHost content="Add user" id='addUser'>
-                            <FaUserPlus size={24} style={{ margin: '0 1rem', cursor: 'pointer' }} onClick={this._openModal} />
-                        </TooltipHost>
-                    </div>
-                    <div className={classNames.selectionDetails}>
-                        <Stack className={classNames.iconsStackStyle}>
-                            {this._selection.count > 0 &&
-                                <TooltipHost content="Delete" id={'delete'}>
-                                    <MdDelete size={20} className={classNames.iconStyle} onClick={() => this._getSelectedUsers()} />
-                                </TooltipHost>
-                            }
-                            {this._selection.count === 1 &&
-                                <TooltipHost content="Edit" id={'Edit'}>
-                                    <MdEdit size={20} className={classNames.iconStyle} onClick={() => this._getSelectedUser()} />
-                                </TooltipHost>
-                            }
-                        </Stack>
-                        {selectionDetails}
-                    </div>
-                    <Announced message={selectionDetails} />
-                    {announcedMessage ? <Announced message={announcedMessage} /> : undefined}
-                    {isModalSelection ? (
-                        <MarqueeSelection selection={this._selection}>
-                            <DetailsList
-                                items={items}
-                                compact={isCompactMode}
-                                columns={columns}
-                                selectionMode={SelectionMode.multiple}
-                                getKey={this._getKey}
-                                setKey="multiple"
-                                layoutMode={DetailsListLayoutMode.justified}
-                                isHeaderVisible={true}
-                                selection={this._selection}
-                                selectionPreservedOnEmptyClick={true}
+                <div style={{...modal && { filter : "blur(3px)", pointerEvents : "none"}}}>
+                    <div style={TableComponentStyle}>
+                        <div className={classNames.controlWrapper}>
+                            <TextField label="Search" onChange={this._onChangeText} styles={controlStyles} />
+                            <Announced message={`Number of items after filter applied: ${items.length}.`} />
+                            <TooltipHost content="Add user" id='addUser'>
+                                <FaUserPlus size={24} style={{ margin: '0 1rem', cursor: 'pointer' }} onClick={this._openModal} />
+                            </TooltipHost>
+                        </div>
+                        <div className={classNames.selectionDetails}>
+                            <Stack className={classNames.iconsStackStyle}>
+                                {this._selection.count > 0 &&
+                                    <TooltipHost content="Delete" id={'delete'}>
+                                        <MdDelete size={20} className={classNames.iconStyle} onClick={() => this._getSelectedUsers()} />
+                                    </TooltipHost>
+                                }
+                                {this._selection.count === 1 &&
+                                    <TooltipHost content="Edit" id={'Edit'}>
+                                        <MdEdit size={20} className={classNames.iconStyle} onClick={() => this._getSelectedUser()} />
+                                    </TooltipHost>
+                                }
+                            </Stack>
+                            {selectionDetails}
+                        </div>
+                        <div>
+                            <Announced message={selectionDetails} />
+                            {announcedMessage ? <Announced message={announcedMessage} /> : undefined}
+                            {isModalSelection ? (
+                                <MarqueeSelection selection={this._selection}>
+                                    <DetailsList
+                                        items={items}
+                                        compact={isCompactMode}
+                                        columns={columns}
+                                        selectionMode={SelectionMode.multiple}
+                                        getKey={this._getKey}
+                                        setKey="multiple"
+                                        layoutMode={DetailsListLayoutMode.justified}
+                                        isHeaderVisible={true}
+                                        selection={this._selection}
+                                        selectionPreservedOnEmptyClick={true}
+                                        // onItemInvoked={this._onItemInvoked}
+                                        enterModalSelectionOnTouch={true}
+                                        ariaLabelForSelectionColumn="Toggle selection"
+                                        ariaLabelForSelectAllCheckbox="Toggle selection for all items"
+                                        checkButtonAriaLabel="select row"
+                                    />
+                                </MarqueeSelection>
+                            ) : (
+                                <DetailsList
+                                    items={items}
+                                    compact={isCompactMode}
+                                    columns={columns}
+                                    selectionMode={SelectionMode.none}
+                                    getKey={this._getKey}
+                                    setKey="none"
+                                    layoutMode={DetailsListLayoutMode.justified}
+                                    isHeaderVisible={true}
                                 // onItemInvoked={this._onItemInvoked}
-                                enterModalSelectionOnTouch={true}
-                                ariaLabelForSelectionColumn="Toggle selection"
-                                ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-                                checkButtonAriaLabel="select row"
-                            />
-                        </MarqueeSelection>
-                    ) : (
-                        <DetailsList
-                            items={items}
-                            compact={isCompactMode}
-                            columns={columns}
-                            selectionMode={SelectionMode.none}
-                            getKey={this._getKey}
-                            setKey="none"
-                            layoutMode={DetailsListLayoutMode.justified}
-                            isHeaderVisible={true}
-                        // onItemInvoked={this._onItemInvoked}
-                        />
-                    )}
+                                />
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                <Form editid={0}/>
+
+                {
+                    (modal && <Form editid={0} currentUser={this.state.currentUser} setUpdatedUsers={this.setUpdatedUsers.bind(this)} closeModal={this.closeModal}/>)
+                }
 
                 {/* {modal && <Form closeModal={this.closeModal} currentUser={this.state.currentUser} setUpdatedUsers={this.setUpdatedUsers.bind(this)} />} */}
             </>

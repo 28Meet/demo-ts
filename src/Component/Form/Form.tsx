@@ -10,6 +10,7 @@ import Input from "../common/input/Input";
 import DropDown from "../common/dropdown/DropDown";
 import Button from "../common/button/Button";
 import { initialState, initialErrorState } from "../common/Constants";
+import { IUser } from "../common/Constants";
 import { AiOutlineClose } from "react-icons/ai";
 import RadioButton from "../common/radiogroup/RadioButton";
 import NumberTxtFeild from "../common/numbertxtField/NumberTxtFeild";
@@ -18,7 +19,10 @@ import { json } from "stream/consumers";
 initializeIcons();
 
 type formPropTypes = {
-    editid: number;
+    editid: number,
+    currentUser: IUser,
+    setUpdatedUsers: Function,
+    closeModal : Function
 }
 
 type StateTypes = {
@@ -28,7 +32,8 @@ type StateTypes = {
     number: string,
     gender: string | undefined,
     city: string,
-    permission : boolean,
+    permission: boolean,
+    isDeleted: boolean,
     id: number
 }
 
@@ -39,7 +44,7 @@ type errorTypes = {
     numberError: boolean,
     genderError: boolean,
     cityError: boolean,
-    permissionError : boolean
+    permissionError: boolean
 }
 
 type errorMsgTypes = {
@@ -67,7 +72,7 @@ const selectOptions: IDropdownOption[] = [
 
 
 const Form = (props: formPropTypes) => {
-    let { editid } = props;
+    let { editid, currentUser, setUpdatedUsers, closeModal } = props;
     const [data, setData] = useState<StateTypes>(initialState);
     const [error, setError] = useState<errorTypes>(initialErrorState);
     const [errorMsg, setErrorMsg] = useState<errorMsgTypes>({
@@ -93,10 +98,23 @@ const Form = (props: formPropTypes) => {
         width: "100%"
     }
 
-    const errorTextStyle : React.CSSProperties = {
-        color : "#a4262c",
-        display : "block",
-        fontSize : "12px"
+    const errorTextStyle: React.CSSProperties = {
+        color: "#a4262c",
+        display: "block",
+        fontSize: "12px"
+    }
+
+    const headerStyle: Partial<IStackStyles> = {
+        root: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center"
+        }
+    }
+
+    const closeIcon: React.CSSProperties = {
+        cursor: "pointer"
     }
 
     const CGStyles: IChoiceGroupStyles = {
@@ -155,8 +173,8 @@ const Form = (props: formPropTypes) => {
             setError({ ...error, genderError: false });
         } else if (fieldName == "city") {
             setError({ ...error, cityError: false });
-        } else if(fieldName == "permission") {
-            setError({...error, permissionError : false })
+        } else if (fieldName == "permission") {
+            setError({ ...error, permissionError: false })
         } else {
 
         }
@@ -185,7 +203,16 @@ const Form = (props: formPropTypes) => {
             border: '2px solid black',
             padding: "1rem",
             paddingTop: "0.1rem",
-            margin: "auto"
+            margin: "0 auto",
+            zIndex: 3,
+            background: "white"
+        }
+    }
+
+    const mainStyle : Partial<IStackStyles> = {
+        root : {
+            zIndex : 1,
+            marginTop : "-540px"
         }
     }
 
@@ -203,7 +230,7 @@ const Form = (props: formPropTypes) => {
                 numberError: true,
                 genderError: true,
                 cityError: true,
-                permissionError : true
+                permissionError: true
             });
         } else if (name == "") {
             setError({ ...error, nameError: true });
@@ -217,14 +244,14 @@ const Form = (props: formPropTypes) => {
             setError({ ...error, genderError: true });
         } else if (city == "") {
             setError({ ...error, cityError: true });
-        } else if(permission == false) {
-            setError({ ...error, permissionError : true})
+        } else if (permission == false) {
+            setError({ ...error, permissionError: true })
         } else {
             if (isUpdate) {
                 let user = new Array();
                 user = JSON.parse(localStorage.getItem("RECORD")!);
-                for(let i = 0 ; i < user.length; i++){
-                    if(user[i].id == editid){
+                for (let i = 0; i < user.length; i++) {
+                    if (user[i].id == currentUser.id) {
                         user[i].name = data.name;
                         user[i].address = data.address;
                         user[i].mail = data.mail;
@@ -250,12 +277,12 @@ const Form = (props: formPropTypes) => {
                 if (record.length != 0) {
                     // data.id = ID;
                     // console.log(data);
-                    record.push({...data, id : ID}); 
+                    record.push({ ...data, id: ID });
                     console.log(record);
                     ID++;
                     localStorage.setItem("RECORD", JSON.stringify(record));
                     localStorage.setItem("ID", JSON.stringify(ID));
-                } 
+                }
                 //else {
                 //     data.id = 1;
                 //     ID = 2;
@@ -265,12 +292,15 @@ const Form = (props: formPropTypes) => {
                 //     localStorage.setItem("ID", JSON.stringify(ID));
                 // }
             }
+            setData(initialState);
+            setError(initialErrorState);
+            closeModal();
         }
     }
 
     const handleReset = () => {
-       setData(initialState);
-       setError(initialErrorState);
+        setData(initialState);
+        setError(initialErrorState);
     }
 
     const getUserData = () => {
@@ -284,63 +314,76 @@ const Form = (props: formPropTypes) => {
     }
 
     useEffect(() => {
-        (editid != 0 && getUserData());
-    }, [editid]);
+        if (currentUser.id !== 0) {
+            setData(currentUser);
+            setIsUpdate(true);
+            // console.log(currentUser);
+        }
+    }, [currentUser]);
 
     return (
-        <Stack styles={parentStyle}>
-            <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco", color : "grey" }}>
-                {
-                    (isUpdate) ? "Update" : "Registration"
-                }
-            </h2>
-            <Input name="name" Label="Name" value={name} multiline={false} error={nameError} errorMsg={nameMsg} onKeyPress={() => removeError('name')} onLeave={() => checkError("name")} onchange={handleChange} />
+        <Stack styles={mainStyle}>
+            <Stack styles={parentStyle}>
+                <Stack styles={headerStyle}>
+                    <h2 style={{ fontSize: FontSizes.size28, fontFamily: "Monaco", color: "grey" }}>
+                        {
+                            (isUpdate) ? "Update" : "Registration"
+                        }
+                    </h2>
+                    <AiOutlineClose style={closeIcon} onClick={() => closeModal()}/>
+                </Stack>
+                <Input name="name" Label="Name" value={name} multiline={false} error={nameError} errorMsg={nameMsg} onKeyPress={() => removeError('name')} onLeave={() => checkError("name")} onchange={handleChange} />
 
-            <Input name="address" Label="Address" value={address} multiline={true} error={addressError} errorMsg={addressMsg} onKeyPress={() => removeError("address")} onLeave={() => checkError("address")} onchange={handleChange} />
+                <Input name="address" Label="Address" value={address} multiline={true} error={addressError} errorMsg={addressMsg} onKeyPress={() => removeError("address")} onLeave={() => checkError("address")} onchange={handleChange} />
 
-            <Input name="mail" Label="Email" value={mail} multiline={false} error={mailError} errorMsg={mailMsg} onKeyPress={() => removeError("mail")} onLeave={() => checkError("mail")} onchange={handleChange} />
+                <Input name="mail" Label="Email" value={mail} multiline={false} error={mailError} errorMsg={mailMsg} onKeyPress={() => removeError("mail")} onLeave={() => checkError("mail")} onchange={handleChange} />
 
-            <Input name="number" Label="Mobile" value={number} multiline={false} error={numberError} errorMsg={numberMsg} onKeyPress={() => removeError("number")} onLeave={() => checkError("number")} onchange={handleChange} />
+                <Input name="number" Label="Mobile" value={number} multiline={false} error={numberError} errorMsg={numberMsg} onKeyPress={() => removeError("number")} onLeave={() => checkError("number")} onchange={handleChange} />
 
-            <Stack.Item style={genderStyles}>
-                <ChoiceGroup
-                    name="gender"
-                    // value={gender}
-                    defaultSelectedKey={gender}
-                    selectedKey={gender}
-                    options={options}
-                    label="Gender"
-                    styles={CGStyles}
-                    onChange={(ev?: FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
-                        let value = option?.key;
-                        setData({ ...data, gender: value });
-                    }}
-                    required
-                />
-                <Stack.Item>
-                {
-                    (genderError && <Text style={errorTextStyle}>Please select your gender</Text>)
-                }
+                <Stack.Item style={genderStyles}>
+                    <ChoiceGroup
+                        name="gender"
+                        // value={gender}
+                        defaultSelectedKey={gender}
+                        selectedKey={gender}
+                        options={options}
+                        label="Gender"
+                        styles={CGStyles}
+                        onChange={(ev?: FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
+                            let value = option?.key;
+                            setData({ ...data, gender: value });
+                        }}
+                        required
+                    />
+                    <Stack.Item>
+                        {
+                            (genderError && <Text style={errorTextStyle}>Please select your gender</Text>)
+                        }
+                    </Stack.Item>
                 </Stack.Item>
-            </Stack.Item>
 
-            {/* <RadioButton name="gender" value={gender} options={options} label="Gender" setGender={setGenderValue} /> */}
+                {/* <RadioButton name="gender" value={gender} options={options} label="Gender" setGender={setGenderValue} /> */}
 
-            <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")} removeError={() => removeError("city")} />
+                <DropDown label="City" options={selectOptions} setCity={setCity} value={city} error={cityError} errorMsg={cityMsg} onLeave={() => checkError("city")} removeError={() => removeError("city")} />
 
-            <Stack.Item style={{ marginTop: "10px" }}>
-                <Checkbox checked={permission} onChange={() => {removeError('permission'); setData({...data, permission : !permission})}} label="I have read and understand company terms and conditions." />
-                <Stack.Item>
+                <Stack.Item style={{ marginTop: "10px" }}>
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                        <Checkbox checked={permission} onChange={() => { removeError('permission'); setData({ ...data, permission: !permission }) }} />I have read and understand company  <a href="#" style={{ textDecoration: "none" }}> terms </a> and  <a href="#" style={{ textDecoration: "none" }}> conditions </a>.
+                    </div>
+                    <Stack.Item>
+                        {
+                            (permissionError && <Text style={{ color: "#a4262c", display: "block", fontSize: "12px", textAlign: "left" }}>You must accept terms and conditions</Text>)
+                        }
+                    </Stack.Item>
+                </Stack.Item>
+
+                <Stack.Item style={buttonStyles}>
+                    <Button  {...(isUpdate ? { text: "SAVE", margin: "auto" } : { text: "Sign Up", margin: "5px" })} color="#0078d4" textColor="white" onclick={handleSubmit} />
                     {
-                        (permissionError && <Text style={{ color: "#a4262c", display : "block", fontSize : "12px", textAlign : "left"}}>You must accept terms and conditions</Text>)
+                        ((!isUpdate) && <Button text="Reset" margin="auto" color="#9c27b0" textColor="white" onclick={handleReset} />)
                     }
                 </Stack.Item>
-            </Stack.Item>
-
-            <Stack.Item style={buttonStyles}>
-                <Button  {...(isUpdate ? { text: "Update" } : { text: "Sign Up" })} color="#0078d4" textColor="white" onclick={handleSubmit} />
-                <Button text="Reset" color="#9c27b0" textColor="white" onclick={handleReset} />
-            </Stack.Item>
+            </Stack>
         </Stack>
     );
 }

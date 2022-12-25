@@ -4,15 +4,16 @@ type buttonPropsType = {
     text : string,
     color : string,
     textColor : string,
-    onclick : Function
+    margin : string | number,
+    onclick : Function,
 }
 
 const Button = (props : buttonPropsType) => {
-    let { text, color, textColor, onclick } = props;
+    let { text, color, textColor,  margin, onclick, } = props;
     return(
         <>
             <DefaultButton 
-                style={{ backgroundColor : color, color : textColor }}
+                style={{ backgroundColor : color, color : textColor, margin : margin }}
                 text={text}
                 onClick={() => onclick()}
             />
